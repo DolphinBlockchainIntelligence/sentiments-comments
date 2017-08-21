@@ -1,0 +1,101 @@
+<template>
+  <div id="sentiments-comments">
+    <div v-if="!commentsError" class="scrolled-y">
+      <ul class="comments">
+          <li v-for="(comment, key) in comments" :class="'comment sentiment'+comment.Sentiment">
+          <div class="heading">
+            <div class="author">{{ comment.user }}:</div>
+            <div class="date">{{ comment.date }}:</div>
+          </div>
+          <a :href="'https://bitcointalk.org/index.php?topic='+comment.topicId+'.msg'+key+'#msg'+key" target="_blank" class="text">{{ comment.text }}:</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+import moment from 'moment'
+import _ from 'lodash'
+const colors = ['#f98a83', '#989898', '#85f77e']
+export default {
+  name: "sentimentsComments",
+  props: ['id'],
+  data: function data() {
+    return {
+      commentsError: false,
+      comments: []
+    }
+  },
+  mounted () {
+    this.sentimentsComments()
+  },
+  methods: {
+    sentimentsComments: function () {
+      const postId = this.$route.params.id
+      axios.get('http://178.218.115.169:5000/btt-sentiments/D'+ postId +'.json')
+      .then(response => {
+        _.forEach(response.data, function(item, i) {
+          item.date = moment(item.date).calendar()
+        })
+        // slice n elements from object
+        const pick = (obj, keys) => 
+          Object.keys(obj)
+            .slice(0, keys)
+            .reduce((acc, key) => {
+              acc[key] = obj[key];
+              return acc;
+            }, {})
+        this.comments = pick(response.data, 30)
+      })
+      .catch(e => {
+        this.commentsError = true
+        this.errors.push(e)
+      })
+    },
+    removeWidget: function () {
+      this.$root.$emit('removeWidget', this.id)
+    }
+  }
+}
+</script>
+
+
+<style lang="sass" scoped>
+.sentiment0 .text
+  background: #f98a83
+.sentiment1 .text
+  background: #dddddd
+.sentiment2 .text
+  background: #85f77e
+.nodata
+  width: 100%
+  height: 400px
+  display: flex
+  justify-content: center
+  align-items: center
+  border: 1px solid #ccc
+.comments
+  list-style: none
+  padding: 0
+  margin: 0 10px
+  .comment
+    margin-bottom: 20px
+    .heading
+      display: flex
+      justify-content: space-between
+      color: #999
+    .text
+      padding: 7px 14px
+      border-radius: 2px
+      display: block
+      color: #292b2c
+      text-decoration: none
+      cursor: pointer
+      opacity: .8
+      &:hover
+        opacity: 1
+.scrolled-y
+  overflow-y: scroll
+</style>
