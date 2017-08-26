@@ -15,6 +15,7 @@
   </div>
 </template>
 
+
 <script>
 import axios from 'axios'
 import moment from 'moment'
@@ -78,7 +79,14 @@ export default {
 </script>
 
 
+<style lang="sass">
+html
+  overflow-x: hidden !important
+</style>
+
 <style lang="sass" scoped>
+html
+  overflow-x: hidden
 .hide
   display: none
 .sentiment0 .text
@@ -91,8 +99,10 @@ export default {
   list-style: none
   padding: 0
   margin: 0 10px
+  overflow-x: hidden
   .comment
     margin-bottom: 20px
+    overflow-x: hidden
     .heading
       display: flex
       justify-content: space-between
