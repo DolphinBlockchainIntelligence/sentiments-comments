@@ -26,7 +26,6 @@ export default {
   props: ['id'],
   data: function data() {
     return {
-      // comments: [],
       commentsSource: [],
       showNumber: 30,
       showAll: false
@@ -43,7 +42,6 @@ export default {
         item.date = moment(item.date).calendar()
       })
       if (!this.showAll) {
-        // slice n elements from object
         const pick = (obj, keys) =>
           Object.keys(obj)
             .slice(0, keys)
@@ -82,6 +80,8 @@ export default {
 <style lang="sass">
 html
   overflow-x: hidden !important
+body
+  margin: 0
 </style>
 
 <style lang="sass" scoped>
