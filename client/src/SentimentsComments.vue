@@ -98,10 +98,10 @@ html
 .comments
   list-style: none
   padding: 0
-  margin: 0 10px
+  margin: 0 7px
   overflow-x: hidden
   .comment
-    margin-bottom: 20px
+    margin-bottom: 14px
     overflow-x: hidden
     .heading
       display: flex
