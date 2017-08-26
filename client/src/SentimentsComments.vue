@@ -1,16 +1,17 @@
 <template>
   <div id="sentiments-comments">
-    <div v-if="!commentsError" class="scrolled-y">
-      <ul class="comments">
-          <li v-for="(comment, key) in comments" :class="'comment sentiment'+comment.Sentiment">
-          <div class="heading">
-            <div class="author">{{ comment.user }}:</div>
-            <div class="date">{{ comment.date }}:</div>
-          </div>
-          <a :href="'https://bitcointalk.org/index.php?topic='+comment.topicId+'.msg'+key+'#msg'+key" target="_blank" class="text">{{ comment.text }}:</a>
-        </li>
-      </ul>
-    </div>
+    <ul class="comments">
+        <li v-for="(comment, key) in comments" :class="'comment sentiment'+comment.Sentiment">
+        <div class="heading">
+          <div class="author">{{ comment.user }}:</div>
+          <div class="date">{{ comment.date }}:</div>
+        </div>
+        <a :href="'https://bitcointalk.org/index.php?topic='+comment.topicId+'.msg'+key+'#msg'+key" target="_blank" class="text">{{ comment.text }}:</a>
+      </li>
+    </ul>
+    <p align="center">
+      <a class="waves-effect waves-light btn btn-show-all" @click.prevent="toShowAll($event)">Show all</a>
+    </p>
   </div>
 </template>
 
@@ -24,38 +25,53 @@ export default {
   props: ['id'],
   data: function data() {
     return {
-      commentsError: false,
-      comments: []
+      // comments: [],
+      commentsSource: [],
+      showNumber: 30,
+      showAll: false
     }
   },
   mounted () {
-    this.sentimentsComments()
+    this.loadComments()
   },
-  methods: {
-    sentimentsComments: function () {
-      const postId = this.$route.params.id
-      axios.get('http://178.218.115.169:5000/btt-sentiments/D'+ postId +'.json')
-      .then(response => {
-        _.forEach(response.data, function(item, i) {
-          item.date = moment(item.date).calendar()
-        })
+  computed: {
+    comments () {
+      var comments = this.commentsSource
+      comments = _.orderBy(comments, ['date'], ['desc'])
+      comments = _.forEach(comments, function(item, i) {
+        item.date = moment(item.date).calendar()
+      })
+      if (!this.showAll) {
         // slice n elements from object
-        const pick = (obj, keys) => 
+        const pick = (obj, keys) =>
           Object.keys(obj)
             .slice(0, keys)
             .reduce((acc, key) => {
               acc[key] = obj[key];
               return acc;
             }, {})
-        this.comments = pick(response.data, 30)
+        comments = pick(comments, this.showNumber)
+      }
+      return comments
+    }
+  },
+  methods: {
+    loadComments: function () {
+      const postId = this.$route.params.id
+      axios.get('http://178.218.115.169:5000/btt-sentiments/D'+ postId +'.json')
+      .then(response => {
+        this.commentsSource = response.data
       })
       .catch(e => {
-        this.commentsError = true
         this.errors.push(e)
       })
     },
     removeWidget: function () {
       this.$root.$emit('removeWidget', this.id)
+    },
+    toShowAll: function (event) {
+      this.showAll = true
+      event.currentTarget.classList.add('hide')
     }
   }
 }
@@ -63,19 +79,14 @@ export default {
 
 
 <style lang="sass" scoped>
+.hide
+  display: none
 .sentiment0 .text
   background: #f98a83
 .sentiment1 .text
   background: #dddddd
 .sentiment2 .text
   background: #85f77e
-.nodata
-  width: 100%
-  height: 400px
-  display: flex
-  justify-content: center
-  align-items: center
-  border: 1px solid #ccc
 .comments
   list-style: none
   padding: 0
@@ -96,6 +107,4 @@ export default {
       opacity: .8
       &:hover
         opacity: 1
-.scrolled-y
-  overflow-y: scroll
 </style>
