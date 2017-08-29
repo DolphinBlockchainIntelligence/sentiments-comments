@@ -1,5 +1,5 @@
 <template>
-  <div id="sentiments-comments">
+  <div id="sentiments-comments" class="sentiments-comments">
     <ul class="comments">
         <li v-for="(comment, key) in comments" :class="'comment sentiment'+comment.Sentiment">
         <div class="heading">
@@ -89,6 +89,8 @@ html
   overflow-x: hidden
 .hide
   display: none
+.sentiments-comments
+  margin: 7px 0
 .sentiment0 .text
   background: #f98a83
 .sentiment1 .text
