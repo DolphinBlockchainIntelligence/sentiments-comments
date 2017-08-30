@@ -58,7 +58,7 @@ export default {
     loadComments: function () {
       const postId = this.$route.params.id
       // axios.get('http://178.218.115.169:5000/btt-sentiments/D'+ postId +'.json')
-      axios.get('/dashboard/static/data/btt-sentiments/D'+ postId +'.json')
+      axios.get('/dashboard/data/btt-sentiments/D'+ postId +'.json')
       .then(response => {
         this.commentsSource = response.data
       })
